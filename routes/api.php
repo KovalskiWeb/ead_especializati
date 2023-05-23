@@ -7,21 +7,28 @@ use App\Http\Controllers\Api\{
     ReplySupportController,
     SupportController
 };
+use App\Http\Controllers\Api\Auth\AuthController;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/courses', [CourseController::class, 'index']);
-Route::get('/courses/{id}', [CourseController::class, 'show']);
+Route::post('/auth', [AuthController::class, 'auth']);
+Route::post('/logout', [AuthController::class, 'logout'])->middleware('auth:sanctum');
+Route::get('/me', [AuthController::class, 'me'])->middleware('auth:sanctum');
 
-Route::get('/courses/{id}/modules', [ModuleController::class, 'index']);
+Route::middleware(['auth:sanctum'])->group(function () {
+    Route::get('/courses', [CourseController::class, 'index']);
+    Route::get('/courses/{id}', [CourseController::class, 'show']);
 
-Route::get('/modules/{id}/lessons', [LessonController::class, 'index']);
-Route::get('/lessons/{id}', [LessonController::class, 'show']);
+    Route::get('/courses/{id}/modules', [ModuleController::class, 'index']);
 
-Route::get('/my-supports', [SupportController::class, 'mySupports']);
-Route::get('/supports', [SupportController::class, 'index']);
-Route::post('/supports', [SupportController::class, 'store']);
+    Route::get('/modules/{id}/lessons', [LessonController::class, 'index']);
+    Route::get('/lessons/{id}', [LessonController::class, 'show']);
 
-Route::post('/replies', [ReplySupportController::class, 'storeReply']);
+    Route::get('/my-supports', [SupportController::class, 'mySupports']);
+    Route::get('/supports', [SupportController::class, 'index']);
+    Route::post('/supports', [SupportController::class, 'store']);
+
+    Route::post('/replies', [ReplySupportController::class, 'storeReply']);
+});
 
 Route::get('/', function () {
     return response()->json([
